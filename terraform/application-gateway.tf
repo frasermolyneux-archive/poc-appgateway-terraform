@@ -107,14 +107,4 @@ resource "azurerm_application_gateway" "appgw" {
     backend_http_settings_name = local.http_setting_name
     priority                   = 1
   }
-
-  private_link_configuration {
-    name = "primary"
-    ip_configuration {
-      name               = "primary"
-      subnet_id          = azurerm_subnet.endpoints[each.value].id
-      private_ip_address = "Dynamic"
-      primary            = true
-    }
-  }
 }
