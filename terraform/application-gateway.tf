@@ -54,16 +54,16 @@ resource "azurerm_application_gateway" "appgw" {
     port = 80
   }
 
-  //frontend_ip_configuration {
-  //  name                 = local.frontend_ip_configuration_name
-  //  public_ip_address_id = azurerm_public_ip.appgw[each.value].id
-  //}
+  frontend_ip_configuration {
+    name                 = local.frontend_ip_configuration_name
+    public_ip_address_id = azurerm_public_ip.appgw[each.value].id
+  }
 
   frontend_ip_configuration {
-    name                 = "private"
-    subnet_id = azurerm_subnet.endpoints[each.value].id
-    private_ip_address_allocation = "Static"
-    private_ip_address = "10.0.1.1"
+    name                            = "private"
+    subnet_id                       = azurerm_subnet.endpoints[each.value].id
+    private_ip_address_allocation   = "Static"
+    private_ip_address              = "10.0.1.1"
     private_link_configuration_name = local.private_link_enabled ? "private" : null
   }
 
@@ -72,10 +72,10 @@ resource "azurerm_application_gateway" "appgw" {
     content {
       name = "private"
       ip_configuration {
-        name                 = "private"
-        subnet_id            = azurerm_subnet.endpoints[each.value].id
-        private_ip_address_allocation   = "Dynamic"
-        primary = true
+        name                          = "private"
+        subnet_id                     = azurerm_subnet.endpoints[each.value].id
+        private_ip_address_allocation = "Dynamic"
+        primary                       = true
       }
     }
   }
@@ -111,9 +111,10 @@ resource "azurerm_application_gateway" "appgw" {
   private_link_configuration {
     name = "primary"
     ip_configuration {
-      name                 = "primary"
-      subnet_id            = azurerm_subnet.endpoints[each.value].id
-      private_ip_address   = "Dynamic"
-      primary = true
+      name               = "primary"
+      subnet_id          = azurerm_subnet.endpoints[each.value].id
+      private_ip_address = "Dynamic"
+      primary            = true
+    }
   }
 }
