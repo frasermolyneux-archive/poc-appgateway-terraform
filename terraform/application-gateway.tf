@@ -67,18 +67,28 @@ resource "azurerm_application_gateway" "appgw" {
     private_link_configuration_name = local.private_link_enabled ? "private" : null
   }
 
-  dynamic "private_link_configuration" {
-    for_each = local.private_link_enabled ? [1] : []
-    content {
-      name = "private"
-      ip_configuration {
-        name                          = "private"
-        subnet_id                     = azurerm_subnet.endpoints[each.value].id
-        private_ip_address_allocation = "Dynamic"
-        primary                       = true
-      }
+  private_link_configuration {
+    name = "private"
+    ip_configuration {
+      name                          = "private"
+      subnet_id                     = azurerm_subnet.endpoints[each.value].id
+      private_ip_address_allocation = "Dynamic"
+      primary                       = true
     }
   }
+
+  //dynamic "private_link_configuration" {
+  //  for_each = local.private_link_enabled ? [1] : []
+  //  content {
+  //    name = "private"
+  //    ip_configuration {
+  //      name                          = "private"
+  //      subnet_id                     = azurerm_subnet.endpoints[each.value].id
+  //      private_ip_address_allocation = "Dynamic"
+  //      primary                       = true
+  //    }
+  //  }
+  //}
 
   backend_address_pool {
     name = local.backend_address_pool_name
