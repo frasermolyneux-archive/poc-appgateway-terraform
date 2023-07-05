@@ -1,4 +1,6 @@
 locals {
+  private_link_enabled = true
+
   frontend_port_name             = "frontendport"
   frontend_ip_configuration_name = "agipconfig"
   backend_address_pool_name      = "backendpool"
@@ -52,9 +54,30 @@ resource "azurerm_application_gateway" "appgw" {
     port = 80
   }
 
+  //frontend_ip_configuration {
+  //  name                 = local.frontend_ip_configuration_name
+  //  public_ip_address_id = azurerm_public_ip.appgw[each.value].id
+  //}
+
   frontend_ip_configuration {
-    name                 = local.frontend_ip_configuration_name
-    public_ip_address_id = azurerm_public_ip.appgw[each.value].id
+    name                 = "private"
+    subnet_id = azurerm_subnet.endpoints[each.value].id
+    private_ip_address_allocation = "Static"
+    private_ip_address = "10.0.1.1"
+    private_link_configuration_name = local.private_link_enabled ? "private" : null
+  }
+
+  dynamic "private_link_configuration" {
+    for_each = local.private_link_enabled ? [1] : []
+    content {
+      name = "private"
+      ip_configuration {
+        name                 = "private"
+        subnet_id            = azurerm_subnet.endpoints[each.value].id
+        private_ip_address_allocation   = "Dynamic"
+        primary = true
+      }
+    }
   }
 
   backend_address_pool {
@@ -83,5 +106,14 @@ resource "azurerm_application_gateway" "appgw" {
     backend_address_pool_name  = local.backend_address_pool_name
     backend_http_settings_name = local.http_setting_name
     priority                   = 1
+  }
+
+  private_link_configuration {
+    name = "primary"
+    ip_configuration {
+      name                 = "primary"
+      subnet_id            = azurerm_subnet.endpoints[each.value].id
+      private_ip_address   = "Dynamic"
+      primary = true
   }
 }
