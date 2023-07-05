@@ -61,9 +61,9 @@ resource "azurerm_application_gateway" "appgw" {
 
   frontend_ip_configuration {
     name                            = "private"
-    subnet_id                       = azurerm_subnet.endpoints[each.value].id
+    subnet_id                       = azurerm_subnet.frontend[each.value].id
     private_ip_address_allocation   = "Static"
-    private_ip_address              = "10.0.1.1"
+    private_ip_address              = "10.0.1.10"
     private_link_configuration_name = local.private_link_enabled ? "private" : null
   }
 
