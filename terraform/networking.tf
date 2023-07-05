@@ -26,6 +26,8 @@ resource "azurerm_subnet" "endpoints" {
   virtual_network_name = azurerm_virtual_network.apps[each.value].name
 
   address_prefixes = [var.subnets[each.value]["endpoints"]]
+
+  private_link_service_network_policies_enabled = false
 }
 
 resource "azurerm_subnet" "frontend" {
